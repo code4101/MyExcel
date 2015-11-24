@@ -59,7 +59,7 @@ End Function
 'https://brettdotnet.wordpress.com/2012/03/30/convert-a-collection-to-an-array-vba/
 Function CollectionToArray(c As Collection) As Variant()
     Dim A() As Variant: ReDim A(1 To c.Count)
-    Dim i As Integer
+    Dim i As Long
     For i = 1 To c.Count
         A(i) = c.Item(i)
     Next
