@@ -38,12 +38,12 @@ Function 对Collection排序(c As Collection) As Collection
 End Function
 Function 对Collection重复项汇总(c As Collection, Optional 重复项计数分隔符 = "", Optional 数量1不显示 As Boolean = False) As Collection
 '(1)先计算出每一项的数量
-    Dim cnt As Object: Set cnt = CreateObject("Scripting.Dictionary") '用于建立字典辅助
+    Dim cnt As New Dictionary '用于建立字典辅助
     For Each k In c
         cnt(k) = cnt(k) + 1
     Next k
 '(2)算出新的集合
-    Dim d As Object: Set d = CreateObject("Scripting.Dictionary")
+    Dim d As New Dictionary
     Set 对Collection重复项汇总 = New Collection
     For Each k In c
         If Not d.Exists(k) Then 'd存储已经visited的项
