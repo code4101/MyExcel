@@ -4,10 +4,11 @@ Function get集合Text( _
     Optional 排序 As Boolean = True, _
     Optional 重复项计数 As Boolean = True, _
     Optional 项分隔符 As String = ", ", _
-    Optional 重复项计数分隔符 = "") As String
+    Optional 重复项计数分隔符 = "", _
+    Optional 数量1不显示 As Boolean = False) As String
 '(1)
     If 重复项计数 Then
-        Set c = 对Collection重复项汇总(c, 重复项计数分隔符)
+        Set c = 对Collection重复项汇总(c, 重复项计数分隔符, 数量1不显示)
     End If
 '(2)
     If 排序 Then
@@ -35,18 +36,22 @@ Function 对Collection排序(c As Collection) As Collection
         对Collection排序.add aa
     Next aa
 End Function
-Function 对Collection重复项汇总(c As Collection, Optional 重复项计数分隔符 = "") As Collection
+Function 对Collection重复项汇总(c As Collection, Optional 重复项计数分隔符 = "", Optional 数量1不显示 As Boolean = False) As Collection
 '(1)先计算出每一项的数量
-    Dim cnt As New Dictionary '用于建立字典辅助
+    Dim cnt As Object: Set cnt = CreateObject("Scripting.Dictionary") '用于建立字典辅助
     For Each k In c
         cnt(k) = cnt(k) + 1
     Next k
 '(2)算出新的集合
-    Dim d As New Dictionary
+    Dim d As Object: Set d = CreateObject("Scripting.Dictionary")
     Set 对Collection重复项汇总 = New Collection
     For Each k In c
         If Not d.Exists(k) Then 'd存储已经visited的项
-            对Collection重复项汇总.add k & 重复项计数分隔符 & cnt(k)
+            If 数量1不显示 And cnt(k) = 1 Then
+                对Collection重复项汇总.add k
+            Else
+                对Collection重复项汇总.add k & 重复项计数分隔符 & cnt(k)
+            End If
             d.add k, ""
         End If
     Next k
@@ -54,7 +59,7 @@ End Function
 'https://brettdotnet.wordpress.com/2012/03/30/convert-a-collection-to-an-array-vba/
 Function CollectionToArray(c As Collection) As Variant()
     Dim A() As Variant: ReDim A(1 To c.Count)
-    Dim i As Long
+    Dim i As Integer
     For i = 1 To c.Count
         A(i) = c.Item(i)
     Next
