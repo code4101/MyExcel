@@ -26,17 +26,17 @@ Function get集合Text( _
 '(4)return
     get集合Text = ans
 End Function
-Function 对Collection排序(c As Collection) As Collection
+Private Function 对Collection排序(c As Collection) As Collection
 '实现原理：先将集合转成数组Array，对Array使用quicksort，然后再将排好序的Array存回新的Colllection
     Set 对Collection排序 = New Collection
     Dim A() As Variant
     A = CollectionToArray(c)
     Call QuickSort(A, LBound(A), UBound(A))
     For Each aa In A
-        对Collection排序.add aa
+        对Collection排序.Add aa
     Next aa
 End Function
-Function 对Collection重复项汇总(c As Collection, Optional 重复项计数分隔符 = "", Optional 数量1不显示 As Boolean = False) As Collection
+Private Function 对Collection重复项汇总(c As Collection, Optional 重复项计数分隔符 = "", Optional 数量1不显示 As Boolean = False) As Collection
 '(1)先计算出每一项的数量
     Dim cnt As New Dictionary '用于建立字典辅助
     For Each k In c
@@ -48,16 +48,16 @@ Function 对Collection重复项汇总(c As Collection, Optional 重复项计数分隔符 = "",
     For Each k In c
         If Not d.Exists(k) Then 'd存储已经visited的项
             If 数量1不显示 And cnt(k) = 1 Then
-                对Collection重复项汇总.add k
+                对Collection重复项汇总.Add k
             Else
-                对Collection重复项汇总.add k & 重复项计数分隔符 & cnt(k)
+                对Collection重复项汇总.Add k & 重复项计数分隔符 & cnt(k)
             End If
-            d.add k, ""
+            d.Add k, ""
         End If
     Next k
 End Function
 'https://brettdotnet.wordpress.com/2012/03/30/convert-a-collection-to-an-array-vba/
-Function CollectionToArray(c As Collection) As Variant()
+Private Function CollectionToArray(c As Collection) As Variant()
     Dim A() As Variant: ReDim A(1 To c.Count)
     Dim i As Long
     For i = 1 To c.Count
@@ -67,7 +67,7 @@ Function CollectionToArray(c As Collection) As Variant()
 End Function
 
 ' 来源:http://stackoverflow.com/questions/152319/vba-array-sort-function
-Public Sub QuickSort(vArray As Variant, inLow As Long, inHi As Long)
+Private Sub QuickSort(vArray As Variant, inLow As Long, inHi As Long)
 
   Dim pivot   As Variant
   Dim tmpSwap As Variant
@@ -105,13 +105,13 @@ Public Sub QuickSort(vArray As Variant, inLow As Long, inHi As Long)
 End Sub
 
 
-Sub Test()
+Private Sub Test()
     Dim c As New Collection
-    c.add "苹果"
-    c.add "苹果"
-    c.add "梨"
-    c.add "香蕉"
-    c.add "梨"
+    c.Add "苹果"
+    c.Add "苹果"
+    c.Add "梨"
+    c.Add "香蕉"
+    c.Add "梨"
     
     '不排序，计数
     Debug.Print get集合Text(c, False)               '苹果2, 梨2, 香蕉1
