@@ -14,8 +14,9 @@
 ====
 ```mermaid
 graph TD;
-  1.1.get集合Text-->1.2.一对多值汇总;
-  1.1.get集合Text-->1.3.CKeyValuesDic;
+  1.1.get集合Text-->1.2.CKeyValuesDic;
+  1.1.get集合Text-->1.3.一对多值汇总;
+  1.2.CKeyValuesDic-->1.3.一对多值汇总;
 ```
 
 1.1.辅助模块:get集合Text
@@ -55,21 +56,10 @@ get集合Text
 | 排序 | True  | 按value名称进行升序排序,False时则按Collection中原来的顺序 |
 | 重复项计数  | True | 如果有相同元素,则进行合并 |
 | 项分隔符  | ", " |  |
-| 重复项计数分隔符  | "" | 如果value本身后缀带数字,为了避免混淆，有时候要分隔符 |
+| 重复项计数分隔符  | "" | 如果value本身后缀带数字,为了避免混淆,有时候要分隔符 |
 | 数量1不显示 | False  | 重复项计数为True时，对数量只有1个的项目不显示数量1 |
 
-1.2.一对多值汇总
-----
-在Sheets("一对多值汇总")，写一个方便使用的"界面"。
-
-分析"get集合Text"，除了排序，共有5个参数，其中4个是设置信息，可以将这4项用控件来控制。
-这4项中，两个是Boolean值，两个是文本内容的输入。
-最后输出两个字段的信息，所以基本界面设计如下:
-![](./image/QQ截图20151125114747.png)
-*(还未添加计数分隔符的控件)*
-
-
-1.3.一键多值字典:CKeyValuesDic
+1.2.一键多值字典:CKeyValuesDic
 ----
 两个方法(sub)
 1. Private Sub Class_Initialize()
@@ -84,15 +74,14 @@ get集合Text
  	返回某个key对应的所有value值。
 3. Text(...) As String
 	以文本的形式显示一键多值字典的内容。
-| 参数名  | 默认值 | 说明   |
-|-------|---|-----------|
-| 键与值的分隔符  | ": " |      |
-| 值与值的分隔符 | ", "  |       |
-| 记录分隔符  | vbCr   | 默认按换行符分开每个key-values对 |
-| 排序  | True |   按value名称进行升序排序   |
-| 重复项计数 | False  |       |
-| 重复项计数分隔符  | "" | 如果value本身后缀带数字,为了避免混淆，有时候要分隔符 |
-
+    | 参数名  | 默认值 | 说明   |
+    |-------|---|-----------|
+    | 键与值的分隔符  | ": " |      |
+    | 值与值的分隔符 | ", "  |       |
+    | 记录分隔符  | vbCr   | 默认按换行符分开每个key-values对 |
+    | 排序  | True |   按value名称进行升序排序   |
+    | 重复项计数 | False  |       |
+    | 重复项计数分隔符  | "" | 如果value本身后缀带数字,为了避免混淆,有时候要分隔符 |
 
 
 ```vb
@@ -127,3 +116,53 @@ End Sub
 
 TODO:
 - [ ]: 添加数量1不显示的功能
+
+1.3.一对多值汇总
+----
+在Sheets("一对多值汇总")，写一个方便使用的"界面"。
+
+分析"get集合Text"，除了排序，共有5个参数，其中4个是设置信息，可以将这4项用控件来控制。
+这4项中，两个是Boolean值，两个是文本内容的输入。
+最后输出两个字段的信息，所以基本界面设计(以及程序运行效果)如下:
+![](./image/QQ截图20151125114747.png)
+
+这里涉及到的控件代码有两个。
+一个是"计数功能"的开关会影响到部分控件是否可用:
+```vb
+Private Sub 计数功能_Click()
+    With 计数功能
+        显示数量1.Enabled = .value
+        Label1.Enabled = .value
+        TextBox1.Enabled = .value
+    End With
+End Sub
+```
+
+另一个是点击按钮开始执行程序的代码，使用1.2中的类进行数据存储，而并没有使用其类的Text属性。使用1.1中的get集合Text来进行每个集合的格式设置。
+```vb
+Private Sub 按key汇总value_Click()
+    程序初始化与反初始化 True
+    
+    Range([G2], Cells(Rows.Count, "H")).ClearContents   '清除旧数据
+    
+    'a:定义变量
+    Dim d As New CKeyValuesDic
+    Dim p As Range: Set p = Cells(2, "A")
+    'b:获取数据
+    Do While p <> ""
+        d.Add p.Text, p.Offset(0, 1).Text   '这里要写p.Offset(0, 1).Text而不是p.Offset(0, 1)
+        Set p = p.Offset(1, 0)
+    Loop
+    'Debug.Print d.Text(重复项计数:=True)
+    'c:按指定格式输出
+    Dim i As Long: i = 2
+    For Each k In d.getKeys
+        Cells(i, "G") = k
+        Cells(i, "H") = get集合Text(d.getValues(k), True, 计数功能.value, _
+                        分隔符.value, TextBox1.value, Not 显示数量1.value)
+        i = i + 1
+    Next k
+    
+    程序初始化与反初始化 False
+End Sub
+```
